@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Membershipplans | NexusMembership{% endblock %}
+{% block page_title %}Membershipplans{% endblock %}
+{% block content %}
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem">
+  <form class="search-bar" method="get" style="flex:1;margin-bottom:0">
+    <input type="text" name="search" value="{{ search }}" placeholder="Search membershipplans...">
+    <select name="status" onchange="this.form.submit()">
+      <option value="">All Duration</option>
+      <option value="monthly" {% if status_filter == 'monthly' %}selected{% endif %}>Monthly</option>
+      <option value="quarterly" {% if status_filter == 'quarterly' %}selected{% endif %}>Quarterly</option>
+      <option value="annual" {% if status_filter == 'annual' %}selected{% endif %}>Annual</option>
+      <option value="lifetime" {% if status_filter == 'lifetime' %}selected{% endif %}>Lifetime</option>
+    </select>
+    <button type="submit" class="btn btn-primary btn-sm">Search</button>
+  </form>
+  <a href="/membershipplans/create/" class="btn btn-primary">+ New MembershipPlan</a>
+</div>
+
+<div class="card">
+  {% if records %}
+  <table>
+    <thead>
+      <tr><th>Name</th><th>Duration</th><th>Price</th><th>Members</th><th>Status</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+      {% for r in records %}
+      <tr>
+        <td><a href="/membershipplans/{{ r.pk }}/edit/"><strong>{{ r.name }}</strong></a></td>
+        <td><span class="badge badge-blue">{{ r.get_duration_display }}</span></td>
+        <td>{{ r.price|floatformat:2 }}</td>
+        <td>{{ r.members|default:"-" }}</td>
+        <td><span class="badge badge-blue">{{ r.get_status_display }}</span></td>
+        <td class="actions">
+          <a href="/membershipplans/{{ r.pk }}/edit/" class="btn btn-primary btn-sm">Edit</a>
+          <form method="post" action="/membershipplans/{{ r.pk }}/delete/" style="display:inline" onsubmit="return confirm('Delete?')">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger btn-sm">Del</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty">
+    <p>No membershipplans found.</p>
+    <a href="/membershipplans/create/" class="btn btn-primary" style="margin-top:1rem">Create MembershipPlan</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
