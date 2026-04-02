@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Memberprofiles | NexusMembership{% endblock %}
+{% block page_title %}Memberprofiles{% endblock %}
+{% block content %}
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem">
+  <form class="search-bar" method="get" style="flex:1;margin-bottom:0">
+    <input type="text" name="search" value="{{ search }}" placeholder="Search memberprofiles...">
+    <select name="status" onchange="this.form.submit()">
+      <option value="">All Status</option>
+      <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+      <option value="expired" {% if status_filter == 'expired' %}selected{% endif %}>Expired</option>
+      <option value="suspended" {% if status_filter == 'suspended' %}selected{% endif %}>Suspended</option>
+      <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Cancelled</option>
+    </select>
+    <button type="submit" class="btn btn-primary btn-sm">Search</button>
+  </form>
+  <a href="/memberprofiles/create/" class="btn btn-primary">+ New MemberProfile</a>
+</div>
+
+<div class="card">
+  {% if records %}
+  <table>
+    <thead>
+      <tr><th>Name</th><th>Email</th><th>Phone</th><th>Plan Name</th><th>Join Date</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+      {% for r in records %}
+      <tr>
+        <td><a href="/memberprofiles/{{ r.pk }}/edit/"><strong>{{ r.name }}</strong></a></td>
+        <td style="color:var(--muted)">{{ r.email|default:"-" }}</td>
+        <td>{{ r.phone|default:"-" }}</td>
+        <td>{{ r.plan_name|default:"-" }}</td>
+        <td style="color:var(--muted)">{{ r.join_date|date:"M d, Y"|default:"-" }}</td>
+        <td class="actions">
+          <a href="/memberprofiles/{{ r.pk }}/edit/" class="btn btn-primary btn-sm">Edit</a>
+          <form method="post" action="/memberprofiles/{{ r.pk }}/delete/" style="display:inline" onsubmit="return confirm('Delete?')">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger btn-sm">Del</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty">
+    <p>No memberprofiles found.</p>
+    <a href="/memberprofiles/create/" class="btn btn-primary" style="margin-top:1rem">Create MemberProfile</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
